@@ -1,0 +1,1 @@
+preprocess: error: inputs/exc5.py:1: name 'FOO' is not defined (perhaps you want "defined('FOO')" instead of "defined(FOO)")

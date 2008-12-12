@@ -1,0 +1,91 @@
+--- preprocess.r1293.py	2007-10-08 15:16:59.000000000 -0700
++++ preprocess.py	2007-10-08 15:07:14.000000000 -0700
+@@ -16,6 +16,7 @@
+         -V, --version   Print the version info and exit.
+         -v, --verbose   Give verbose output for errors.
+ 
++        -l, --logLevel  Level of logging: DEBUG, INFO, WARN, ERROR, CRITICAL
+         -o <outfile>    Write output to the given file instead of to stdout.
+         -f, --force     Overwrite given output file. (Otherwise an IOError
+                         will be raised if <outfile> already exists.
+@@ -200,6 +201,19 @@
+         else:
+             self.stream = streamOrFileName
+             self._opennedStream = 0
++
++        self.levelNameMap = {
++            self.DEBUG: "DEBUG",
++            self.INFO: "INFO",
++            self.WARN: "WARN",
++            self.ERROR: "ERROR",
++            self.CRITICAL: "CRITICAL",
++        }
++        self.levelTextNameMap = {}
++        for key, value in self.levelNameMap.iteritems():
++            self.levelTextNameMap[value] = key
++        
++
+     def __del__(self):
+         if self._opennedStream:
+             self.stream.close()
+@@ -208,14 +222,9 @@
+     def setLevel(self, level):
+         self.level = level
+     def _getLevelName(self, level):
+-        levelNameMap = {
+-            self.DEBUG: "DEBUG",
+-            self.INFO: "INFO",
+-            self.WARN: "WARN",
+-            self.ERROR: "ERROR",
+-            self.CRITICAL: "CRITICAL",
+-        }
+-        return levelNameMap[level]
++        return self.levelNameMap[level]
++    def getLevelFromName(self, levelName):
++        return self.levelTextNameMap[levelName]
+     def isEnabled(self, level):
+         return level >= self.level
+     def isDebugEnabled(self): return self.isEnabled(self.DEBUG)
+@@ -241,7 +250,8 @@
+     def fatal(self, msg, *args):
+         self.log(self.CRITICAL, msg, *args)
+ 
+-log = _Logger("preprocess", _Logger.WARN)
++#log = _Logger("preprocess", _Logger.WARN)
++log = _Logger("preprocess", _Logger.ERROR)
+ 
+ 
+ 
+@@ -637,9 +647,9 @@
+ 
+ def main(argv):
+     try:
+-        optlist, args = getopt.getopt(argv[1:], 'hVvo:D:fkI:s',
++        optlist, args = getopt.getopt(argv[1:], 'hVvo:D:fkI:sl:',
+             ['help', 'version', 'verbose', 'force', 'keep-lines',
+-             'substitute'])
++             'substitute','logLevel'])
+     except getopt.GetoptError, msg:
+         sys.stderr.write("preprocess: error: %s. Your invocation was: %s\n"\
+                          % (msg, argv))
+@@ -650,6 +660,7 @@
+     force = 0
+     keepLines = 0
+     substitute = 0
++    verbose = 0
+     includePath = []
+     for opt, optarg in optlist:
+         if opt in ('-h', '--help'):
+@@ -659,7 +670,12 @@
+             sys.stdout.write("preprocess %s\n" % __version__)
+             return 0
+         elif opt in ('-v', '--verbose'):
++            verbose = 1
+             log.setLevel(log.DEBUG)
++        elif opt in ('-l', '--logLevel'):
++            name = optarg
++            if not verbose:
++                log.setLevel(log.getLevelFromName(name))
+         elif opt == '-o':
+             outfile = optarg
+         if opt in ('-f', '--force'):

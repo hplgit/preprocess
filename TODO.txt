@@ -1,0 +1,46 @@
+# High Priority
+
+- move to google code
+- add issues for everything important here
+- add issue from Mike Bauer:
+    Yes, that is a problem that I occassionally ran into, but mostly just hacked around because I didn't think it would be that common.
+
+    To "fix" this, I think I want to get strict about the preprocess.py directive by requiring no space between the second "#" and the directive name:
+
+        # #if ...     (this works)
+        ##  if ...    (this is not treated as a preprocess.py directive)
+
+- add logging_patch_from_alfred.patch
+- use path_from_path_patterns recipe to provide a simple facility for
+  recursively preprocessing a bunch of files, a dir, etc. As suggested by
+  Hans.
+- fix MANIFEST.in processing from picking up README.txt in .svn dirs
+- need eolconverter recipe for building dists on Windows
+- "build sdist" broken on Windows
+- "build webdist" not implemented on Windows
+- should I do dists for both kinds of EOLs???
+- convert to logging package
+- put up on cheeseshop
+
+
+# Medium Priority
+
+- A better longterm fix for 0.9.2's copying content.types to the "binDir"
+  next to preprocess.py is to have the launcher stub NOT have the .py file
+  next to it. We should only be placing one preprocess.py in the lib dir.
+  Perhaps setuptools stub stuff can help here?
+- test 'includePath' optional argument
+- test cases for the module interface (do I have any?)
+- test cases for -k|--keep-lines
+- patchtemplate functionality: look at how the preprocessor.pl below does
+  this, perhaps this is an acceptible poorman's version
+  (Somewhat have this, see --substitute added in v0.6.0.)
+- stealing from http://software.hixie.ch/utilities/unix/preprocessor/
+    - Should I really add #elifdef and #elifndef?
+    - Would #filter/#endfilter be useful?
+- be more strict:
+    - perhaps add -W<arg> option to allow levels of strictness
+      - make #undef of undefined vars an error
+- perhaps add #pragma to enable turning on of options: e.g.
+    # #pragma substitution
+    

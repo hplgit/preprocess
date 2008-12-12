@@ -1,0 +1,21 @@
+- Id: 1
+  Status: Fixed
+  Title: Nested #if-blocks will not be properly handled.
+  Test-Case: test_nested_bug1.py
+  Description:
+    In the following code:
+         #if 0
+             #if 1
+                 foo
+             #endif
+         #endif
+    the "foo" line _will_ get printed, even though it should not.
+
+- Id: 2
+  Status: Open
+  Title: Substitution (when turned on via -s) will substitute into
+      program strings
+  Test-Case: test_subst_bug2.py
+  Description:
+    That is not the ideal behaviour (ideal being defined by (1) what I
+    would expect in my program, and (2) what the C preprocessor does).

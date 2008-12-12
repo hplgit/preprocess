@@ -1,0 +1,1 @@
+preprocess: error: inputs/exc4.py:5: illegal #elif after #else in same #if block
