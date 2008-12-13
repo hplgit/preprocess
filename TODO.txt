@@ -30,7 +30,7 @@
         # #if ...     (this works)
         ##  if ...    (this is not treated as a preprocess.py directive)
 
-- add logging_patch_from_alfred.patch
+- add logging_patch_from_alfred.patch (Alfred Lorber)
 - use path_from_path_patterns recipe to provide a simple facility for
   recursively preprocessing a bunch of files, a dir, etc. As suggested by
   Hans.

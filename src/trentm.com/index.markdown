@@ -14,7 +14,7 @@
 <div class="download-box">
 <strong>Download</strong>
 <ul>
-<li> <a href="http://trentm.com/downloads/preprocess/1.0.3/preprocess-1.0.3.zip">preprocess.py 1.0.3 source package</a> </li>
+<li> <a href="http://preprocess.googlecode.com/files/preprocess-1.2.0.zip">preprocess.py 1.1 archive package</a> </li>
 </ul> </div>
 
 <table class="attrlist">
@@ -34,11 +34,11 @@
 </tr>
 <tr>
     <th>Current Version</th>
-    <td>1.0.3 <span class="remark"><a href="#whatsnew">What's new?</a></span></td>
+    <td>1.1 <span class="remark"><a href="#whatsnew">What's new?</a></span></td>
 </tr>
 <tr>
     <th>Dev Status</th>
-    <td>Fairly mature, has been used in the Komodo build system for over 3 years.</td>
+    <td>Fairly mature, has been used in the Komodo build system for over 7 years.</td>
 </tr>
 <tr>
     <th>Requirements</th>
@@ -101,7 +101,7 @@ or, with a JavaScript file:
     }
     // #endif
     ...                                     ...
-     
+
 Despite these contrived examples preprocess has proved useful for
 build-time code differentiation in the
 [Komodo](http://www.activestate.com/Komodo) build system -- which
@@ -138,8 +138,8 @@ thing.com).
 Download the latest `preprocess` source package, unzip it, and run `python
 setup.py install`:
 
-    unzip preprocess-1.0.3.zip
-    cd preprocess-1.0.3
+    unzip preprocess-1.1.0.zip
+    cd preprocess-1.1.0
     python setup.py install
 
 If your install fails then please visit [the Troubleshooting
@@ -212,7 +212,7 @@ information:
         <comment-prefix> <preprocessor-statement> <comment-suffix>
     where the <comment-prefix/suffix> are the native comment delimiters for
     that file type. 
-    
+
 
     Examples
     --------
@@ -222,7 +222,7 @@ information:
         <!-- #if FOO -->
         ...
         <!-- #endif -->
-    
+
     Python (*.py), Perl (*.pl), Tcl (*.tcl), Ruby (*.rb), Bash (*.sh),
     or make ([Mm]akefile*) files:
 
@@ -291,6 +291,36 @@ And, for module usage, read the preprocess.preprocess() docstring:
 
 <h2 id="changelog">Change Log</h2>
 
+
+### v1.1.0
+- Move to code.google.com/p/preprocess for code hosting.
+- Re-org directory structure to assist with deployment to pypi and
+  better installation with setup.py.
+
+### v1.0.9
+- Fix the 'contentType' optional arg for #include's.
+- Add cheap XML content sniffing.
+
+### v1.0.8
+- Allow for JS and CSS-style comment delims in XML/HTML. Ideally this
+  would deal with full lexing but that isn't going to happen soon.
+
+### v1.0.7
+- Allow explicit specification of content type.
+### v1.0.6
+- Add ability to include a filename mentioned in a define: '#include
+  VAR'.
+
+
+### v1.0.5
+- Make sure to use the *longest* define names first when doing
+  substitutions. This ensure that substitution in this line:
+        FOO and BAR are FOOBAR
+  will do the right thing if there are "FOO" and "FOOBAR" defines.
+
+### v1.0.4
+- Add WiX XML file extensions.
+- Add XSLT file extensions.
 
 ### v1.0.3
 - TeX support (from Hans Petter Langtangen)
