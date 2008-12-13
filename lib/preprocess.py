@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-# Copyright (c) 2002-2006 ActiveState Software Inc.
+# Copyright (c) 2002-2008 ActiveState Software Inc.
 # License: MIT License (http://www.opensource.org/licenses/mit-license.php)
-# Contributors:
-#   Trent Mick (TrentM@ActiveState.com)
-#   Hans Petter Langtangen
 
 """
     Preprocess a file.
@@ -120,7 +117,7 @@
     recognize the unpreprocessed file as the original language.
 """
 
-__version_info__ = (1, 0, 9)
+__version_info__ = (1, 1, 0)
 __version__ = '.'.join(map(str, __version_info__))
 
 import os

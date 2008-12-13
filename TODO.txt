@@ -1,9 +1,6 @@
 # High Priority
 
-- code repo:
-    - checkin the state before this patch to google code
-    - branch to branches/1.0.x
-    - rev to 1.1.0 with these changes and hans.txt stuff and do a new release
+- rev to 1.1.0 with these changes and hans.txt stuff and do a new release
 - hans.txt:
     Makefile.py
     mk test (see hans' patches)
