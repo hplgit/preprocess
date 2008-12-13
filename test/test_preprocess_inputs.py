@@ -41,7 +41,7 @@ def _testOneInputFile(self, fname):
     # Preprocess.
     infile = os.path.join('inputs', fname) # input
     outfile = os.path.join('tmp', fname) # actual output
-    preprocess_py = join(dirname(dirname(__file__)), "preprocess.py")
+    preprocess_py = join(dirname(dirname(__file__)), "lib", "preprocess.py")
     argv = [sys.executable, preprocess_py] + opts + ["-o", outfile, infile]
     dummy, err, retval = testsupport.run(argv)
     try:

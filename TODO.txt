@@ -1,6 +1,29 @@
 # High Priority
 
-- move to google code
+- code repo:
+    - checkin the state before this patch to google code
+    - branch to branches/1.0.x
+    - rev to 1.1.0 with these changes and hans.txt stuff and do a new release
+- hans.txt:
+    Makefile.py
+    mk test (see hans' patches)
+        - checkin
+        - move content.types *inside* preprocess.py, still have support for
+          a prepended content.types:
+            - look in dirname(__file__)
+            - add an option for a content.types
+          Update docs for this
+        - support Python 2.3? If so, fix that in 'test' task
+    setup.py
+    googlecode release
+    pypi release
+    trentm.com update
+- switch to testlib.py
+- move BUGS.txt to issues on code site
+- move to 1.0.x branch and start preprocess 2: if can justify the change for:
+    - string inter syntax that doesn't suffer from accidents (though that
+      creates a prob for maintain syntax validity in the document)
+    - stricter syntax to avoid accidental ##if
 - add issues for everything important here
 - add issue from Mike Bauer:
     Yes, that is a problem that I occassionally ran into, but mostly just hacked around because I didn't think it would be that common.

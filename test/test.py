@@ -89,7 +89,7 @@ def _setUp():
     sys.path.insert(0, dirname(dirname(abspath(__file__))))
     sys.stdout.write("Setup to test: ")
     sys.stdout.flush()
-    preprocess_py = join(dirname(dirname(abspath(__file__))), "preprocess.py")
+    preprocess_py = join(dirname(dirname(abspath(__file__))), "lib", "preprocess.py")
     os.system("%s %s -V" % (sys.executable, preprocess_py))
     sys.stdout.write("-"*70 + '\n')
     
