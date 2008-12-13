@@ -2,13 +2,13 @@ preprocess.py -- a portable multi-language file preprocessor
 ============================================================
 
 Download the latest preprocess.py packages from here:
-    (source) http://trentm.com/downloads/preprocess/1.0.3/preprocess-1.0.3.zip
+    (source) http://trentm.com/downloads/preprocess/1.0.9/preprocess-1.0.9.zip
 
 
 Home            : http://trentm.com/projects/preprocess/
 License         : MIT (see LICENSE.txt)
 Platforms       : Windows, Linux, Mac OS X, Unix
-Current Version : 1.0.3
+Current Version : 1.0.9
 Dev Status      : Fairly mature, has been used in the Komodo build system for
                   over 3 years.
 Requirements    : Python >= 2.3 (http://www.activestate.com/ActivePython/)
@@ -69,7 +69,7 @@ or, with a JavaScript file:
     }
     // #endif
     ...                                     ...
-     
+
 Despite these contrived examples preprocess has proved useful for
 build-time code differentiation in the
 [Komodo](http://www.activestate.com/Komodo) build system -- which
@@ -106,8 +106,8 @@ Install Notes
 Download the latest `preprocess` source package, unzip it, and run `python
 setup.py install`:
 
-    unzip preprocess-1.0.3.zip
-    cd preprocess-1.0.3
+    unzip preprocess-1.0.9.zip
+    cd preprocess-1.0.9
     python setup.py install
 
 If your install fails then please visit [the Troubleshooting
@@ -180,7 +180,7 @@ information:
         <comment-prefix> <preprocessor-statement> <comment-suffix>
     where the <comment-prefix/suffix> are the native comment delimiters for
     that file type. 
-    
+
 
     Examples
     --------
@@ -190,7 +190,7 @@ information:
         <!-- #if FOO -->
         ...
         <!-- #endif -->
-    
+
     Python (*.py), Perl (*.pl), Tcl (*.tcl), Ruby (*.rb), Bash (*.sh),
     or make ([Mm]akefile*) files:
 
@@ -258,6 +258,31 @@ And, for module usage, read the preprocess.preprocess() docstring:
 
 Change Log
 ----------
+
+### v1.0.9
+- Fix the 'contentType' optional arg for #include's.
+- Add cheap XML content sniffing.
+
+### v1.0.8
+- Allow for JS and CSS-style comment delims in XML/HTML. Ideally this
+  would deal with full lexing but that isn't going to happen soon.
+
+### v1.0.7
+- Allow explicit specification of content type.
+### v1.0.6
+- Add ability to include a filename mentioned in a define: '#include
+  VAR'.
+
+
+### v1.0.5
+- Make sure to use the *longest* define names first when doing
+  substitutions. This ensure that substitution in this line:
+        FOO and BAR are FOOBAR
+  will do the right thing if there are "FOO" and "FOOBAR" defines.
+
+### v1.0.4
+- Add WiX XML file extensions.
+- Add XSLT file extensions.
 
 ### v1.0.3
 - TeX support (from Hans Petter Langtangen)
