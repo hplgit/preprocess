@@ -1,10 +1,7 @@
 # High Priority
 
-- rev to 1.1.0 with these changes and hans.txt stuff and do a new release
 - hans.txt:
-    Makefile.py
     mk test (see hans' patches)
-        - checkin
         - move content.types *inside* preprocess.py, still have support for
           a prepended content.types:
             - look in dirname(__file__)
