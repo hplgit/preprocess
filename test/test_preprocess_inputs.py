@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Copyright (c) 2002 Trent Mick
+# Copyright (c) 2002-2008 Trent Mick
 # License: MIT License (http://www.opensource.org/licenses/mit-license.php)
 # Contributors:
 #   Trent Mick (TrentM@ActiveState.com)
@@ -8,7 +8,7 @@
 
 import sys
 import os
-from os.path import join, dirname
+from os.path import join, dirname, abspath, exists
 import unittest
 import difflib
 import pprint
@@ -38,10 +38,12 @@ def _testOneInputFile(self, fname):
             opts.append(line.strip())
         #print "options from '%s': %s" % (optsfile, pprint.pformat(opts))
 
+    # Tags
+
     # Preprocess.
     infile = os.path.join('inputs', fname) # input
     outfile = os.path.join('tmp', fname) # actual output
-    preprocess_py = join(dirname(dirname(__file__)), "lib", "preprocess.py")
+    preprocess_py = join(dirname(dirname(abspath(__file__))), "lib", "preprocess.py")
     argv = [sys.executable, preprocess_py] + opts + ["-o", outfile, infile]
     dummy, err, retval = testsupport.run(argv)
     try:
@@ -84,22 +86,34 @@ def _testOneInputFile(self, fname):
     del sys.modules['preprocess']
         
 
-#for fname in ["keep_lines_bugs.py"]:
-for fname in os.listdir('inputs'):
-    if fname.endswith(".opts"): continue # skip input option files
-    if os.path.isdir(os.path.join('inputs', fname)): continue
-    testFunction = lambda self, fname=fname: _testOneInputFile(self, fname)
-    name = 'test:'+fname
-    setattr(PreprocessInputsTestCase, name, testFunction)
+def _fillPreprocessInputsTestCase():
+    dpath = "inputs"
+    for fname in os.listdir(dpath):
+        if os.path.isdir(os.path.join(dpath, fname)): continue
+        if fname.endswith(".opts"): continue # skip input option files
+        if fname.endswith(".tags"): continue # skip tags files
+        testFunction = lambda self, fname=fname: _testOneInputFile(self, fname)
+
+        # Set tags for this test case.
+        tags = []
+        tagspath = join(dpath, fname + ".tags") # ws-separate set of tags
+        if exists(tagspath):
+            tags += open(tagspath, 'r').read().split()
+        if tags:
+            testFunction.tags = tags
+
+        name = "test_" + fname
+        setattr(PreprocessInputsTestCase, name, testFunction)
 
 
 #---- mainline
 
-def suite():
-    """Return a unittest.TestSuite to be used by test.py."""
-    return unittest.makeSuite(PreprocessInputsTestCase)
+def test_cases():
+    _fillPreprocessInputsTestCase()
+    yield PreprocessInputsTestCase
 
 if __name__ == "__main__":
-    runner = unittest.TextTestRunner(sys.stdout, verbosity=2)
-    result = runner.run(suite())
+    unittest.main()
+
+
 
