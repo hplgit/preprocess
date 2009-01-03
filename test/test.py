@@ -85,11 +85,12 @@ def _getAllTests(testDir):
 
 
 def _setUp():
-    # Ensure the *development* check is tested.
-    sys.path.insert(0, dirname(dirname(abspath(__file__))))
+    # Ensure the *development* preprocess.py is tested.
+    lib_dir = join(dirname(dirname(abspath(__file__))), "lib")
+    sys.path.insert(0, lib_dir)
     sys.stdout.write("Setup to test: ")
     sys.stdout.flush()
-    preprocess_py = join(dirname(dirname(abspath(__file__))), "lib", "preprocess.py")
+    preprocess_py = join(lib_dir, "preprocess.py")
     os.system("%s %s -V" % (sys.executable, preprocess_py))
     sys.stdout.write("-"*70 + '\n')
     
