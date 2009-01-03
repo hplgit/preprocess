@@ -9,10 +9,6 @@ import sys
 import logging
 from pprint import pprint
 
-#contrib_dir = join(dirname(dirname(abspath(__file__))), "contrib")
-#sys.path.insert(0, join(contrib_dir, "testlib"))
-#sys.path.insert(0, join(contrib_dir, "simplejson"))
-#sys.path.insert(0, join(contrib_dir, "chardet"))
 import testlib
 
 

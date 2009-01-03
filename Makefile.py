@@ -51,6 +51,9 @@ class test(Task):
             if ver < (2,3):
                 # Don't support Python < 2.3.
                 continue
+            elif ver >= (3,0):
+                # Don't (yet) support Python 3.
+                continue
             ver_str = "%s.%s" % ver
             print "-- test with Python %s (%s)" % (ver_str, python)
             assert ' ' not in python
@@ -59,7 +62,7 @@ class test(Task):
 
     def _python_ver_from_python(self, python):
         assert ' ' not in python
-        o = os.popen('''%s -c "import sys; print sys.version"''' % python)
+        o = os.popen('''%s -c "import sys; print(sys.version)"''' % python)
         ver_str = o.read().strip()
         ver_bits = re.split("\.|[^\d]", ver_str, 2)[:2]
         ver = tuple(map(int, ver_bits))

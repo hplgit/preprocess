@@ -650,6 +650,32 @@ def preprocess(infile, outfile=sys.stdout, defines={}, force=0, keepLines=0,
     return defines
 
 
+#---- internal support stuff
+#TODO: move other internal stuff down to this section
+
+try:
+    reversed
+except NameError:
+    # 'reversed' added in Python 2.4 (http://www.python.org/doc/2.4/whatsnew/node7.html)
+    def reversed(seq):
+        rseq = list(seq)
+        rseq.reverse()
+        for item in rseq:
+            yield item
+try:
+    sorted
+except NameError:
+    # 'sorted' added in Python 2.4. Note that I'm only implementing enough
+    # of sorted as is used in this module.
+    def sorted(seq, key=None):
+        identity = lambda x: x
+        key_func = (key or identity)
+        sseq = list(seq)
+        sseq.sort(lambda self, other: cmp(key_func(self), key_func(other)))
+        for item in sseq:
+            yield item
+
+
 #---- mainline
 
 def main(argv):

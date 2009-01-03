@@ -1,5 +1,7 @@
 # High Priority
 
+
+- bug: Python 2.3 failure with substitution.py test case
 - hans.txt:
     mk test (see hans' patches)
         - move content.types *inside* preprocess.py, still have support for
@@ -18,7 +20,9 @@
     - string inter syntax that doesn't suffer from accidents (though that
       creates a prob for maintain syntax validity in the document)
     - stricter syntax to avoid accidental ##if
+- bug: bin/preprocess.exe doesn't work now
 - add issues for everything important here
+
 - add issue from Mike Bauer:
     Yes, that is a problem that I occassionally ran into, but mostly just hacked around because I didn't think it would be that common.
 

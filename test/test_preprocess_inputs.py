@@ -28,6 +28,7 @@ class PreprocessInputsTestCase(unittest.TestCase):
 
 def _testOneInputFile(self, fname):
     import preprocess
+    DEBUG = False # Set to true to dump status info for each test run.
 
     # Determine input options to use, if any.
     optsfile = os.path.join('inputs', fname+'.opts') # input options
@@ -37,8 +38,6 @@ def _testOneInputFile(self, fname):
             if line[-1] == "\n": line = line[:-1]
             opts.append(line.strip())
         #print "options from '%s': %s" % (optsfile, pprint.pformat(opts))
-
-    # Tags
 
     # Preprocess.
     infile = os.path.join('inputs', fname) # input
@@ -51,11 +50,17 @@ def _testOneInputFile(self, fname):
     except IOError, ex:
         self.fail("unexpected error running '%s': '%s' was not generated:\n"
                   "\t%s" % (' '.join(argv), outfile, err))
-    #print
-    #print "CMD   : %r" % ' '.join(argv)
-    #print "STDOUT: %r" % err
-    #print "STDERR: %r" % err
-    #print "RETVAL: %r" % retval
+    if DEBUG:
+        print
+        print "*"*50, "cmd"
+        print ' '.join(argv)
+        print "*"*50, "stdout"
+        print out
+        print "*"*50, "stderr"
+        print err
+        print "*"*50, "retval"
+        print str(retval)
+        print "*" * 50
 
     # Compare results with the expected.
     expoutfile = os.path.join('outputs', fname) # expected stdout output
