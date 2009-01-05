@@ -1,7 +1,6 @@
 # High Priority
 
 
-- bug: Python 2.3 failure with substitution.py test case
 - hans.txt:
     mk test (see hans' patches)
         - move content.types *inside* preprocess.py, still have support for
