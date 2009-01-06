@@ -125,7 +125,7 @@ class webdist(Task):
             "src/trentm.com/index.markdown",
             "LICENSE.txt",
             "lib/preprocess.py",
-            "src/trentm.com/logo.jpg",
+            "src/trentm.com/logo.gif",
         ]
         for src in manifest:
             sh.cp(src, dstdir=zip_dir, log=self.log.info)
