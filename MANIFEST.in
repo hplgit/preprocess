@@ -1,5 +1,6 @@
-include *.py *.cpp *.in preprocess.exe Makefile* preprocess *.txt content.types
-exclude *~
-recursive-include test *.py
+include *.in Makefile*  *.txt MANIFEST
+recursive-include bin preprocess*
 recursive-include test/inputs *
 recursive-include test/outputs *
+recursive-include src/exe *
+exclude *~

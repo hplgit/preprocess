@@ -251,7 +251,7 @@ log = _Logger("preprocess", _Logger.WARN)
 def _evaluate(expr, defines):
     """Evaluate the given expression string with the given context.
 
-    XXX WARNING: This runs eval() on a user string. This is unsafe.
+    WARNING: This runs eval() on a user string. This is unsafe.
     """
     #interpolated = _interpolate(s, defines)
     try:
@@ -275,116 +275,16 @@ def _evaluate(expr, defines):
     return rv
 
 
-#---- content type determination
-# (This is adpated from my 'check' app.)
-
-def _getContentTypesFile():
-    dname = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(dname, "content.types")
-
-def _getContentTypesRegistry(filename=None):
-    """Return the registry for the given content.types file.
-   
-    "filename" can optionally be used to specify a content.types file.
-        Otherwise the default content.types file is used.
-   
-    The registry is three mappings:
-        <suffix> -> <content type>
-        <regex> -> <content type>
-        <filename> -> <content type>
-    """
-    if filename is None:
-        filename = _getContentTypesFile()
-
-    suffixMap = {}
-    regexMap = {}
-    filenameMap = {}
-    log.debug('load content types file: %r' % filename)
-    try:
-        fin = open(filename)
-    except IOError:
-        return
-    while 1:
-        line = fin.readline()
-        if not line: break
-        words = line.split()
-        for i in range(len(words)):
-            if words[i][0] == '#':
-                del words[i:]
-                break
-        if not words: continue
-        contentType, patterns = words[0], words[1:]
-        if not patterns:
-            if line[-1] == '\n': line = line[:-1]
-            raise PreprocessError("bogus content.types line, there must "\
-                                  "be one or more patterns: '%s'" % line)
-        for pattern in patterns:
-            if pattern.startswith('.'):
-                if sys.platform.startswith("win"):
-                    # Suffix patterns are case-insensitive on Windows.
-                    pattern = pattern.lower()
-                suffixMap[pattern] = contentType
-            elif pattern.startswith('/') and pattern.endswith('/'):
-                regexMap[re.compile(pattern[1:-1])] = contentType
-            else:
-                filenameMap[pattern] = contentType
-    fin.close()
-    return suffixMap, regexMap, filenameMap
-
-def getContentType(filename):
-    """Return a content type for the given filename.
-
-    'check' maintains its own registry of content types similar to
-    mime.types registries. See "check.types".  Returns None is no
-    content type can be determined.
-    """
-    suffixMap, regexMap, filenameMap = _getContentTypesRegistry()
-    basename = os.path.basename(filename)
-    contentType = None
-    # Try to determine from the filename.
-    if not contentType and filenameMap.has_key(basename):
-        contentType = filenameMap[basename]
-        log.debug("Content type of '%s' is '%s' (determined from full "\
-                  "filename).", filename, contentType)
-    # Try to determine from the suffix.
-    if not contentType and '.' in basename:
-        suffix = "." + basename.split(".")[-1]
-        if sys.platform.startswith("win"):
-            # Suffix patterns are case-insensitive on Windows.
-            suffix = suffix.lower()
-        if suffixMap.has_key(suffix):
-            contentType = suffixMap[suffix]
-            log.debug("Content type of '%s' is '%s' (determined from "\
-                      "suffix '%s').", filename, contentType, suffix)
-    # Try to determine from the registered set of regex patterns.
-    if not contentType:
-        for regex, ctype in regexMap.items():
-            if regex.search(basename):
-                contentType = ctype
-                log.debug("Content type of '%s' is '%s' (matches regex '%s')",
-                          filename, contentType, regex.pattern)
-                break
-    # Try to determine from the file contents.
-    content = open(filename, 'rb').read()
-    if content.startswith("<?xml"):  # cheap XML sniffing
-        contentType = "XML"
-    # XXX reading shebang line/magic number
-    # XXX reading Emacs-style mode line???
-    # XXX should this be higher?
-    # XXX should the contentType (if XML, say) be FURTHER scoped down
-    return contentType
-
-
-
 #---- module API
 
-def preprocess(infile, outfile=sys.stdout, defines={}, force=0, keepLines=0,
-               includePath=[], substitute=0, contentType=None,
+def preprocess(infile, outfile=sys.stdout, defines={},
+               force=0, keepLines=0, includePath=[], substitute=0, 
+               contentType=None, contentTypeRegistry=None,
                __preprocessedFiles=None):
     """Preprocess the given file.
 
-    "infile" is the input filename.
-    "outfile" is the output filename or stream (default is sys.stdout).
+    "infile" is the input path.
+    "outfile" is the output path or stream (default is sys.stdout).
     "defines" is a dictionary of defined variables that will be
         understood in preprocessor statements. Keys must be strings and,
         currently, only the truth value of any key's value matters.
@@ -399,6 +299,8 @@ def preprocess(infile, outfile=sys.stdout, defines={}, force=0, keepLines=0,
         as well. This may not be what you expect.)
     "contentType" can be used to specify the content type of the input
         file. It not given, it will be guessed.
+    "contentTypeRegistry" is an instance of ContentTypeRegistry. If not specified
+        a default registry will be created.
     "__preprocessedFiles" (for internal use only) is used to ensure files
         are not recusively preprocessed.
 
@@ -418,7 +320,8 @@ def preprocess(infile, outfile=sys.stdout, defines={}, force=0, keepLines=0,
 
     # Determine the content type and comment info for the input file.
     if contentType is None:
-        contentType = getContentType(infile)
+        registry = contentTypeRegistry or getDefaultContentTypeRegistry()
+        contentType = registry.getContentType(infile)
         if contentType is None:
             contentType = "Text"
             log.warn("defaulting content type for '%s' to '%s'",
@@ -648,6 +551,184 @@ def preprocess(infile, outfile=sys.stdout, defines={}, force=0, keepLines=0,
         fout.close()
 
     return defines
+
+
+#---- content-type handling
+
+_gDefaultContentTypes = """
+    # Default file types understood by "preprocess.py".
+    #
+    # Format is an extension of 'mime.types' file syntax.
+    #   - '#' indicates a comment to the end of the line.
+    #   - a line is:
+    #       <filetype> [<pattern>...]
+    #     where,
+    #       <filetype>'s are equivalent in spirit to the names used in the Windows
+    #           registry in HKCR, but some of those names suck or are inconsistent;
+    #           and
+    #       <pattern> is a suffix (pattern starts with a '.'), a regular expression
+    #           (pattern is enclosed in '/' characters), a full filename (anything
+    #           else).
+    #
+    # Notes on case-sensitivity:
+    #
+    # A suffix pattern is case-insensitive on Windows and case-sensitive
+    # elsewhere.  A filename pattern is case-sensitive everywhere. A regex
+    # pattern's case-sensitivity is defined by the regex. This means it is by
+    # default case-sensitive, but this can be changed using Python's inline
+    # regex option syntax. E.g.:
+    #         Makefile            /^(?i)makefile.*$/   # case-INsensitive regex
+
+    Python              .py
+    Python              .pyw
+    Perl                .pl
+    Ruby                .rb
+    Tcl                 .tcl
+    XML                 .xml
+    XML                 .kpf
+    XML                 .xul
+    XML                 .rdf
+    XML                 .xslt
+    XML                 .xsl
+    XML                 .wxs
+    XML                 .wxi
+    HTML                .htm
+    HTML                .html
+    XML                 .xhtml
+    Makefile            /^[Mm]akefile.*$/
+    PHP                 .php
+    JavaScript          .js
+    CSS                 .css
+    C++                 .c       # C++ because then we can use //-style comments
+    C++                 .cpp
+    C++                 .cxx
+    C++                 .cc
+    C++                 .h
+    C++                 .hpp
+    C++                 .hxx
+    C++                 .hh
+    IDL                 .idl
+    Text                .txt
+    Fortran             .f
+    Fortran             .f90
+    Shell               .sh
+    Shell               .csh
+    Shell               .ksh
+    Shell               .zsh
+    Java                .java
+    C#                  .cs
+    TeX                 .tex
+
+    # Some Komodo-specific file extensions
+    Python              .ksf  # Fonts & Colors scheme files
+    Text                .kkf  # Keybinding schemes files
+"""
+
+class ContentTypeRegistry:
+    """A class that handles determining the filetype of a given path.
+
+    Usage:
+        >>> registry = ContentTypeRegistry()
+        >>> registry.getContentType("foo.py")
+        "Python"
+    """
+
+    def __init__(self, contentTypePaths=None):
+        self.contentTypePaths = contentTypePaths
+        self._load()
+
+    def _load(self):
+        from os.path import dirname, join, exists
+
+        self.suffixMap = {}
+        self.regexMap = {}
+        self.filenameMap = {}
+
+        self._loadContentType(_gDefaultContentTypes)
+        localContentTypesPath = join(dirname(__file__), "content.types")
+        if exists(localContentTypesPath):
+            log.debug("load content types file: `%r'" % localContentTypesPath)
+            self._loadContentType(open(localContentTypesPath, 'r').read())
+        for path in (self.contentTypePaths or []):
+            log.debug("load content types file: `%r'" % path)
+            self._loadContentType(open(path, 'r').read())
+
+    def _loadContentType(self, content, path=None):
+        """Return the registry for the given content.types file.
+       
+        The registry is three mappings:
+            <suffix> -> <content type>
+            <regex> -> <content type>
+            <filename> -> <content type>
+        """
+        for line in content.splitlines(0):
+            words = line.strip().split()
+            for i in range(len(words)):
+                if words[i][0] == '#':
+                    del words[i:]
+                    break
+            if not words: continue
+            contentType, patterns = words[0], words[1:]
+            if not patterns:
+                if line[-1] == '\n': line = line[:-1]
+                raise PreprocessError("bogus content.types line, there must "\
+                                      "be one or more patterns: '%s'" % line)
+            for pattern in patterns:
+                if pattern.startswith('.'):
+                    if sys.platform.startswith("win"):
+                        # Suffix patterns are case-insensitive on Windows.
+                        pattern = pattern.lower()
+                    self.suffixMap[pattern] = contentType
+                elif pattern.startswith('/') and pattern.endswith('/'):
+                    self.regexMap[re.compile(pattern[1:-1])] = contentType
+                else:
+                    self.filenameMap[pattern] = contentType
+
+    def getContentType(self, path):
+        """Return a content type for the given path.
+
+        @param path {str} The path of file for which to guess the
+            content type.
+        @returns {str|None} Returns None if could not determine the
+            content type.
+        """
+        basename = os.path.basename(path)
+        contentType = None
+        # Try to determine from the path.
+        if not contentType and self.filenameMap.has_key(basename):
+            contentType = self.filenameMap[basename]
+            log.debug("Content type of '%s' is '%s' (determined from full "\
+                      "path).", path, contentType)
+        # Try to determine from the suffix.
+        if not contentType and '.' in basename:
+            suffix = "." + basename.split(".")[-1]
+            if sys.platform.startswith("win"):
+                # Suffix patterns are case-insensitive on Windows.
+                suffix = suffix.lower()
+            if self.suffixMap.has_key(suffix):
+                contentType = self.suffixMap[suffix]
+                log.debug("Content type of '%s' is '%s' (determined from "\
+                          "suffix '%s').", path, contentType, suffix)
+        # Try to determine from the registered set of regex patterns.
+        if not contentType:
+            for regex, ctype in self.regexMap.items():
+                if regex.search(basename):
+                    contentType = ctype
+                    log.debug("Content type of '%s' is '%s' (matches regex '%s')",
+                              path, contentType, regex.pattern)
+                    break
+        # Try to determine from the file contents.
+        content = open(path, 'rb').read()
+        if content.startswith("<?xml"):  # cheap XML sniffing
+            contentType = "XML"
+        return contentType
+
+_gDefaultContentTypeRegistry = None
+def getDefaultContentTypeRegistry():
+    global _gDefaultContentTypeRegistry
+    if _gDefaultContentTypeRegistry is None:
+        _gDefaultContentTypeRegistry = ContentTypeRegistry()
+    return _gDefaultContentTypeRegistry
 
 
 #---- internal support stuff

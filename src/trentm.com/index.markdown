@@ -296,6 +296,9 @@ And, for module usage, read the preprocess.preprocess() docstring:
 - Move to code.google.com/p/preprocess for code hosting.
 - Re-org directory structure to assist with deployment to pypi and
   better installation with setup.py.
+- Pulled the "content.types" file that assists with filetype
+  determination into "preprocess.py". This makes "preprocess.py" fully
+  independent and also makes the "setup.py" simpler.
 
 ### v1.0.9
 - Fix the 'contentType' optional arg for #include's.

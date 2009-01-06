@@ -28,6 +28,11 @@ class site(Task):
     def make(self):
         webbrowser.open("http://code.google.com/p/preprocess/")
 
+class play(Task):
+    def make(self):
+        sh.run("python setup.py install")
+        sh.run("/Library/Frameworks/Python.framework/Versions/2.5/bin/preprocess foo.txt")
+
 
 class clean(Task):
     """Clean generated files and dirs."""
