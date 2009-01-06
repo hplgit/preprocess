@@ -2,14 +2,6 @@
 
 
 - hans.txt:
-    mk test (see hans' patches)
-        - move content.types *inside* preprocess.py, still have support for
-          a prepended content.types:
-            - look in dirname(__file__)
-            - add an option for a content.types
-          Update docs for this
-        - support Python 2.3? If so, fix that in 'test' task
-    setup.py
     googlecode release
     pypi release
     trentm.com update
