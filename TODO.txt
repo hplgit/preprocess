@@ -5,7 +5,7 @@
     googlecode release
     pypi release
     trentm.com update
-- switch to testlib.py
+
 - move BUGS.txt to issues on code site
 - move to 1.0.x branch and start preprocess 2: if can justify the change for:
     - string inter syntax that doesn't suffer from accidents (though that
@@ -13,6 +13,8 @@
     - stricter syntax to avoid accidental ##if
 - bug: bin/preprocess.exe doesn't work now
 - add issues for everything important here
+- test/testsupport.py:64: DeprecationWarning: The popen2 module is deprecated.  Use the subprocess module.
+    import popen2
 
 - add issue from Mike Bauer:
     Yes, that is a problem that I occassionally ran into, but mostly just hacked around because I didn't think it would be that common.
