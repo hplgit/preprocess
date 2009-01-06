@@ -14,7 +14,7 @@
 <div class="download-box">
 <strong>Download</strong>
 <ul>
-<li> <a href="http://preprocess.googlecode.com/files/preprocess-1.2.0.zip">preprocess.py 1.1 archive package</a> </li>
+<li> <a href="http://preprocess.googlecode.com/files/preprocess-1.1.0.zip">preprocess.py 1.1 archive package</a> </li>
 </ul> </div>
 
 <table class="attrlist">
