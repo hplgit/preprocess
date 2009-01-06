@@ -1,21 +1,12 @@
 # High Priority
 
-
-- hans.txt:
-    googlecode release
-    pypi release
-    trentm.com update
-
 - move BUGS.txt to issues on code site
-- move to 1.0.x branch and start preprocess 2: if can justify the change for:
-    - string inter syntax that doesn't suffer from accidents (though that
-      creates a prob for maintain syntax validity in the document)
-    - stricter syntax to avoid accidental ##if
-- bug: bin/preprocess.exe doesn't work now
+- bug: bin/preprocess.exe doesn't work now  (works when installed on Windows
+  with setup.py because it copies preprocess.py to Scripts as well (don't
+  know why) -- at least for Python 2.5
 - add issues for everything important here
 - test/testsupport.py:64: DeprecationWarning: The popen2 module is deprecated.  Use the subprocess module.
     import popen2
-
 - add issue from Mike Bauer:
     Yes, that is a problem that I occassionally ran into, but mostly just hacked around because I didn't think it would be that common.
 
@@ -28,21 +19,11 @@
 - use path_from_path_patterns recipe to provide a simple facility for
   recursively preprocessing a bunch of files, a dir, etc. As suggested by
   Hans.
-- fix MANIFEST.in processing from picking up README.txt in .svn dirs
-- need eolconverter recipe for building dists on Windows
-- "build sdist" broken on Windows
-- "build webdist" not implemented on Windows
-- should I do dists for both kinds of EOLs???
 - convert to logging package
-- put up on cheeseshop
 
 
 # Medium Priority
 
-- A better longterm fix for 0.9.2's copying content.types to the "binDir"
-  next to preprocess.py is to have the launcher stub NOT have the .py file
-  next to it. We should only be placing one preprocess.py in the lib dir.
-  Perhaps setuptools stub stuff can help here?
 - test 'includePath' optional argument
 - test cases for the module interface (do I have any?)
 - test cases for -k|--keep-lines
@@ -57,4 +38,11 @@
       - make #undef of undefined vars an error
 - perhaps add #pragma to enable turning on of options: e.g.
     # #pragma substitution
+
+
+# Lower Priority
+
+- preprocess 2: if can justify the change for:
+    - string inter syntax that doesn't suffer from accidents (though that
+      creates a prob for maintain syntax validity in the document)
     
