@@ -265,7 +265,9 @@ Change Log
   better installation with setup.py.
 - Pulled the "content.types" file that assists with filetype
   determination into "preprocess.py". This makes "preprocess.py" fully
-  independent and also makes the "setup.py" simpler.
+  independent and also makes the "setup.py" simpler. The
+  "-c|--content-types-path" option can be used to specify
+  addition content types information.
 
 ### v1.0.9
 - Fix the 'contentType' optional arg for #include's.

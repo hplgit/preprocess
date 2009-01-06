@@ -31,6 +31,11 @@
         -s, --substitute    Substitute defines into emitted lines. By
                         default substitution is NOT done because it
                         currently will substitute into program strings.
+        -c, --content-types-path <path>
+                        Specify a path to a content.types file to assist
+                        with filetype determination. See the
+                        `_gDefaultContentTypes` string in this file for
+                        details on its format.
 
     Module Usage:
         from preprocess import preprocess
@@ -43,7 +48,7 @@
         <comment-prefix> <preprocessor-statement> <comment-suffix>
     where the <comment-prefix/suffix> are the native comment delimiters for
     that file type. 
-    
+
 
     Examples
     --------
@@ -279,7 +284,7 @@ def _evaluate(expr, defines):
 
 def preprocess(infile, outfile=sys.stdout, defines={},
                force=0, keepLines=0, includePath=[], substitute=0, 
-               contentType=None, contentTypeRegistry=None,
+               contentType=None, contentTypesRegistry=None,
                __preprocessedFiles=None):
     """Preprocess the given file.
 
@@ -299,7 +304,7 @@ def preprocess(infile, outfile=sys.stdout, defines={},
         as well. This may not be what you expect.)
     "contentType" can be used to specify the content type of the input
         file. It not given, it will be guessed.
-    "contentTypeRegistry" is an instance of ContentTypeRegistry. If not specified
+    "contentTypesRegistry" is an instance of ContentTypesRegistry. If not specified
         a default registry will be created.
     "__preprocessedFiles" (for internal use only) is used to ensure files
         are not recusively preprocessed.
@@ -307,7 +312,8 @@ def preprocess(infile, outfile=sys.stdout, defines={},
     Returns the modified dictionary of defines or raises PreprocessError if
     there was some problem.
     """
-    if __preprocessedFiles is None: __preprocessedFiles = []
+    if __preprocessedFiles is None: 
+        __preprocessedFiles = []
     log.info("preprocess(infile=%r, outfile=%r, defines=%r, force=%r, "\
              "keepLines=%r, includePath=%r, contentType=%r, "\
              "__preprocessedFiles=%r)", infile, outfile, defines, force,
@@ -320,7 +326,7 @@ def preprocess(infile, outfile=sys.stdout, defines={},
 
     # Determine the content type and comment info for the input file.
     if contentType is None:
-        registry = contentTypeRegistry or getDefaultContentTypeRegistry()
+        registry = contentTypesRegistry or getDefaultContentTypesRegistry()
         contentType = registry.getContentType(infile)
         if contentType is None:
             contentType = "Text"
@@ -446,7 +452,8 @@ def preprocess(infile, outfile=sys.stdout, defines={},
                                               % (f, includePath))
                     defines = preprocess(fname, fout, defines, force,
                                          keepLines, includePath, substitute,
-                                         None, __preprocessedFiles)
+                                         contentTypesRegistry=contentTypesRegistry, 
+                                         __preprocessedFiles=__preprocessedFiles)
             elif op in ("if", "ifdef", "ifndef"):
                 if op == "if":
                     expr = match.group("expr")
@@ -624,17 +631,17 @@ _gDefaultContentTypes = """
     Text                .kkf  # Keybinding schemes files
 """
 
-class ContentTypeRegistry:
+class ContentTypesRegistry:
     """A class that handles determining the filetype of a given path.
 
     Usage:
-        >>> registry = ContentTypeRegistry()
+        >>> registry = ContentTypesRegistry()
         >>> registry.getContentType("foo.py")
         "Python"
     """
 
-    def __init__(self, contentTypePaths=None):
-        self.contentTypePaths = contentTypePaths
+    def __init__(self, contentTypesPaths=None):
+        self.contentTypesPaths = contentTypesPaths
         self._load()
 
     def _load(self):
@@ -649,7 +656,7 @@ class ContentTypeRegistry:
         if exists(localContentTypesPath):
             log.debug("load content types file: `%r'" % localContentTypesPath)
             self._loadContentType(open(localContentTypesPath, 'r').read())
-        for path in (self.contentTypePaths or []):
+        for path in (self.contentTypesPaths or []):
             log.debug("load content types file: `%r'" % path)
             self._loadContentType(open(path, 'r').read())
 
@@ -723,12 +730,12 @@ class ContentTypeRegistry:
             contentType = "XML"
         return contentType
 
-_gDefaultContentTypeRegistry = None
-def getDefaultContentTypeRegistry():
-    global _gDefaultContentTypeRegistry
-    if _gDefaultContentTypeRegistry is None:
-        _gDefaultContentTypeRegistry = ContentTypeRegistry()
-    return _gDefaultContentTypeRegistry
+_gDefaultContentTypesRegistry = None
+def getDefaultContentTypesRegistry():
+    global _gDefaultContentTypesRegistry
+    if _gDefaultContentTypesRegistry is None:
+        _gDefaultContentTypesRegistry = ContentTypesRegistry()
+    return _gDefaultContentTypesRegistry
 
 
 #---- internal support stuff
@@ -761,9 +768,9 @@ except NameError:
 
 def main(argv):
     try:
-        optlist, args = getopt.getopt(argv[1:], 'hVvo:D:fkI:s',
+        optlist, args = getopt.getopt(argv[1:], 'hVvo:D:fkI:sc:',
             ['help', 'version', 'verbose', 'force', 'keep-lines',
-             'substitute'])
+             'substitute', 'content-types-path='])
     except getopt.GetoptError, msg:
         sys.stderr.write("preprocess: error: %s. Your invocation was: %s\n"\
                          % (msg, argv))
@@ -775,6 +782,7 @@ def main(argv):
     keepLines = 0
     substitute = 0
     includePath = []
+    contentTypesPaths = []
     for opt, optarg in optlist:
         if opt in ('-h', '--help'):
             sys.stdout.write(__doc__)
@@ -804,6 +812,8 @@ def main(argv):
             includePath.append(optarg)
         elif opt in ('-s', '--substitute'):
             substitute = 1
+        elif opt in ('-c', '--content-types-path'):
+            contentTypesPaths.append(optarg)
 
     if len(args) != 1:
         sys.stderr.write("preprocess: error: incorrect number of "\
@@ -813,8 +823,9 @@ def main(argv):
         infile = args[0]
 
     try:
+        contentTypesRegistry = ContentTypesRegistry(contentTypesPaths)
         preprocess(infile, outfile, defines, force, keepLines, includePath,
-                   substitute)
+                   substitute, contentTypesRegistry=contentTypesRegistry)
     except PreprocessError, ex:
         if log.isDebugEnabled():
             import traceback
