@@ -73,14 +73,20 @@ class test(Task):
         ver = tuple(map(int, ver_bits))
         return ver
 
+    def _gen_python_names(self):
+        yield "python"
+        for ver in [(2,3), (2,4), (2,5), (2,6), (2,7), (3,0), (3,1)]:
+            yield "python%d.%d" % ver
+
     def _gen_pythons(self):
         sys.path.insert(0, join(self.dir, "externals", "which"))
         import which
         python_from_ver = {}
-        for python in which.whichall("python"):
-            ver = self._python_ver_from_python(python)
-            if ver not in python_from_ver:
-                python_from_ver[ver] = python
+        for name in self._gen_python_names():
+            for python in which.whichall(name):
+                ver = self._python_ver_from_python(python)
+                if ver not in python_from_ver:
+                    python_from_ver[ver] = python
         for ver, python in sorted(python_from_ver.items()):
             yield ver, python
         
