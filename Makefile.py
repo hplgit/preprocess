@@ -157,10 +157,15 @@ class googlecode_upload(Task):
     """Upload sdist to Google Code project site."""
     deps = ["sdist"]
     def make(self):
+        helper_in_cwd = exists(join(self.dir, "googlecode_upload.py"))
+        if helper_in_cwd:
+            sys.path.insert(0, self.dir)
         try:
             import googlecode_upload
         except ImportError:
             raise MkError("couldn't import `googlecode_upload` (get it from http://support.googlecode.com/svn/trunk/scripts/googlecode_upload.py)")
+        if helper_in_cwd:
+            del sys.path[0]
 
         ver = _get_version()
         sdist_path = join(self.dir, "dist", "preprocess-%s.zip" % ver)
@@ -170,7 +175,7 @@ class googlecode_upload(Task):
             "preprocess %s source package" % ver, # summary
             ["Featured", "Type-Archive"]) # labels
         if not url:
-            raise MkError("couldn't upload sdsit to Google Code: %s (%s)"
+            raise MkError("couldn't upload sdist to Google Code: %s (%s)"
                           % (reason, status))
         self.log.info("uploaded sdist to `%s'", url)
 
