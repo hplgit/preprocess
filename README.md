@@ -138,7 +138,7 @@ the exact paths may differ on your system.)
 
 ## Getting Started
 
-Once you have it install, run `preprocess --help` for full usage
+Once you have the package installed, run `preprocess --help` for full usage
 information:
 ```
     $ preprocess --help

@@ -75,7 +75,8 @@ def run(argv):
         i, o, e = p.tochild, p.fromchild, p.childerr
         """
         import subprocess as sp
-        p = sp.Popen(cmd,
+        shell = isinstance(cmd, (str,bytes)) # py2: cmd is list, py3: cmd is str
+        p = sp.Popen(cmd, shell=shell,
                      stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE,
                      close_fds=True)
         i, o, e = p.stdin, p.stdout, p.stderr

@@ -78,6 +78,7 @@ def _testOneInputFile(self, fname):
                       % (expoutfile, outfile, pprint.pformat(diff)))
     if os.path.exists(experrfile):
         experr = open(experrfile, 'r').read()
+        err = err.decode('utf-8')  # bytes string in py3
         #print "expected stderr output: %r" % experr
         massaged_experr = experr.replace("inputs/", "inputs"+os.sep)
         diff = list(difflib.ndiff(massaged_experr.strip().splitlines(1),
@@ -91,7 +92,7 @@ def _testOneInputFile(self, fname):
 
     # Ensure next test file gets a clean preprocess.
     del sys.modules['preprocess']
-        
+
 
 def _fillPreprocessInputsTestCase():
     dpath = "inputs"
@@ -121,6 +122,3 @@ def test_cases():
 
 if __name__ == "__main__":
     unittest.main()
-
-
-
