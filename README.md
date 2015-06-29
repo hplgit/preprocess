@@ -3,6 +3,8 @@
 Download the latest preprocess.py packages from
 https://github.com/hplgit/preprocess.git.
 
+|                 |                                          |
+| --------------- | ---------------------------------------- |
 | Home            | https://github.com/hplgit/preprocess.git |
 | License         | MIT (see `LICENSE.txt`)                  |
 | Platforms       | Windows, Linux, Mac OS X, Unix           |
