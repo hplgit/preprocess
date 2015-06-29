@@ -47,7 +47,7 @@
     of the form:
         <comment-prefix> <preprocessor-statement> <comment-suffix>
     where the <comment-prefix/suffix> are the native comment delimiters for
-    that file type. 
+    that file type.
 
 
     Examples
@@ -58,7 +58,7 @@
         <!-- #if FOO -->
         ...
         <!-- #endif -->
-    
+
     Python (*.py), Perl (*.pl), Tcl (*.tcl), Ruby (*.rb), Bash (*.sh),
     or make ([Mm]akefile*) files:
 
@@ -108,7 +108,7 @@
       error to refer to a variable that has not been defined by a -D
       option or by an in-content #define.
     - Special built-in methods for expressions:
-        defined(varName)    Return true if given variable is defined.  
+        defined(varName)    Return true if given variable is defined.
 
 
     Tips
@@ -121,6 +121,11 @@
     The advantage is that other tools (esp. editors) will still
     recognize the unpreprocessed file as the original language.
 """
+from past.builtins import cmp
+from builtins import map
+from builtins import str
+from builtins import range
+from builtins import object
 
 __version_info__ = (1, 1, 0)
 __version__ = '.'.join(map(str, __version_info__))
@@ -192,7 +197,7 @@ _commentGroups = {
 
 #---- internal logging facility
 
-class _Logger:
+class _Logger(object):
     DEBUG, INFO, WARN, ERROR, CRITICAL = range(5)
     def __init__(self, name, level=None, streamOrFileName=sys.stderr):
         self._name = name
@@ -200,7 +205,7 @@ class _Logger:
             self.level = self.WARN
         else:
             self.level = level
-        if type(streamOrFileName) == types.StringType:
+        if type(streamOrFileName) == bytes:
             self.stream = open(streamOrFileName, 'w')
             self._opennedStream = 1
         else:
@@ -261,7 +266,7 @@ def _evaluate(expr, defines):
     #interpolated = _interpolate(s, defines)
     try:
         rv = eval(expr, {'defined':lambda v: v in defines}, defines)
-    except Exception, ex:
+    except Exception as ex:
         msg = str(ex)
         if msg.startswith("name '") and msg.endswith("' is not defined"):
             # A common error (at least this is presumed:) is to have
@@ -283,7 +288,7 @@ def _evaluate(expr, defines):
 #---- module API
 
 def preprocess(infile, outfile=sys.stdout, defines={},
-               force=0, keepLines=0, includePath=[], substitute=0, 
+               force=0, keepLines=0, includePath=[], substitute=0,
                contentType=None, contentTypesRegistry=None,
                __preprocessedFiles=None):
     """Preprocess the given file.
@@ -312,7 +317,7 @@ def preprocess(infile, outfile=sys.stdout, defines={},
     Returns the modified dictionary of defines or raises PreprocessError if
     there was some problem.
     """
-    if __preprocessedFiles is None: 
+    if __preprocessedFiles is None:
         __preprocessedFiles = []
     log.info("preprocess(infile=%r, outfile=%r, defines=%r, force=%r, "\
              "keepLines=%r, includePath=%r, contentType=%r, "\
@@ -382,9 +387,9 @@ def preprocess(infile, outfile=sys.stdout, defines={},
     fin = open(infile, 'r')
     lines = fin.readlines()
     fin.close()
-    if type(outfile) in types.StringTypes:
+    if isinstance(outfile, (str, bytes)):
         if force and os.path.exists(outfile):
-            os.chmod(outfile, 0777)
+            os.chmod(outfile, 0o777)
             os.remove(outfile)
         fout = open(outfile, 'w')
     else:
@@ -441,7 +446,7 @@ def preprocess(infile, outfile=sys.stdout, defines={},
                     else:
                         # This is the first include form: #include "path"
                         f = match.group("fname")
-                        
+
                     for d in [os.path.dirname(infile)] + includePath:
                         fname = os.path.normpath(os.path.join(d, f))
                         if os.path.exists(fname):
@@ -452,7 +457,7 @@ def preprocess(infile, outfile=sys.stdout, defines={},
                                               % (f, includePath))
                     defines = preprocess(fname, fout, defines, force,
                                          keepLines, includePath, substitute,
-                                         contentTypesRegistry=contentTypesRegistry, 
+                                         contentTypesRegistry=contentTypesRegistry,
                                          __preprocessedFiles=__preprocessedFiles)
             elif op in ("if", "ifdef", "ifndef"):
                 if op == "if":
@@ -631,7 +636,7 @@ _gDefaultContentTypes = """
     Text                .kkf  # Keybinding schemes files
 """
 
-class ContentTypesRegistry:
+class ContentTypesRegistry(object):
     """A class that handles determining the filetype of a given path.
 
     Usage:
@@ -662,7 +667,7 @@ class ContentTypesRegistry:
 
     def _loadContentType(self, content, path=None):
         """Return the registry for the given content.types file.
-       
+
         The registry is three mappings:
             <suffix> -> <content type>
             <regex> -> <content type>
@@ -702,7 +707,7 @@ class ContentTypesRegistry:
         basename = os.path.basename(path)
         contentType = None
         # Try to determine from the path.
-        if not contentType and self.filenameMap.has_key(basename):
+        if not contentType and basename in self.filenameMap:
             contentType = self.filenameMap[basename]
             log.debug("Content type of '%s' is '%s' (determined from full "\
                       "path).", path, contentType)
@@ -712,7 +717,7 @@ class ContentTypesRegistry:
             if sys.platform.startswith("win"):
                 # Suffix patterns are case-insensitive on Windows.
                 suffix = suffix.lower()
-            if self.suffixMap.has_key(suffix):
+            if suffix in self.suffixMap:
                 contentType = self.suffixMap[suffix]
                 log.debug("Content type of '%s' is '%s' (determined from "\
                           "suffix '%s').", path, contentType, suffix)
@@ -726,7 +731,7 @@ class ContentTypesRegistry:
                     break
         # Try to determine from the file contents.
         content = open(path, 'rb').read()
-        if content.startswith("<?xml"):  # cheap XML sniffing
+        if content.startswith(b"<?xml"):  # cheap XML sniffing
             contentType = "XML"
         return contentType
 
@@ -771,7 +776,7 @@ def main(argv):
         optlist, args = getopt.getopt(argv[1:], 'hVvo:D:fkI:sc:',
             ['help', 'version', 'verbose', 'force', 'keep-lines',
              'substitute', 'content-types-path='])
-    except getopt.GetoptError, msg:
+    except getopt.GetoptError as msg:
         sys.stderr.write("preprocess: error: %s. Your invocation was: %s\n"\
                          % (msg, argv))
         sys.stderr.write("See 'preprocess --help'.\n")
@@ -826,7 +831,7 @@ def main(argv):
         contentTypesRegistry = ContentTypesRegistry(contentTypesPaths)
         preprocess(infile, outfile, defines, force, keepLines, includePath,
                    substitute, contentTypesRegistry=contentTypesRegistry)
-    except PreprocessError, ex:
+    except PreprocessError as ex:
         if log.isDebugEnabled():
             import traceback
             traceback.print_exc(file=sys.stderr)
@@ -837,4 +842,3 @@ def main(argv):
 if __name__ == "__main__":
     __file__ = sys.argv[0]
     sys.exit( main(sys.argv) )
-

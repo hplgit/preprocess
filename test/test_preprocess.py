@@ -56,7 +56,7 @@ class PreprocessTestCase(unittest.TestCase):
         # If this second one works then the bug is fixed.
         try:
             preprocess.preprocess(inFile, outFile)
-        except preprocess.PreprocessError, ex:
+        except preprocess.PreprocessError as ex:
             self.fail("Second independant preprocess() call incorrectly "\
                       "re-used list of already preprocessed files froma "\
                       "previous call.")

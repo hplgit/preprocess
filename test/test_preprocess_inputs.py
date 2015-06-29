@@ -5,6 +5,8 @@
 #   Trent Mick (TrentM@ActiveState.com)
 
 """Test preprocessing of inputs/... with preprocess.py."""
+from __future__ import print_function
+from builtins import str
 
 import sys
 import os
@@ -47,20 +49,20 @@ def _testOneInputFile(self, fname):
     dummy, err, retval = testsupport.run(argv)
     try:
         out = open(outfile, 'r').read()
-    except IOError, ex:
+    except IOError as ex:
         self.fail("unexpected error running '%s': '%s' was not generated:\n"
                   "\t%s" % (' '.join(argv), outfile, err))
     if DEBUG:
-        print
-        print "*"*50, "cmd"
-        print ' '.join(argv)
-        print "*"*50, "stdout"
-        print out
-        print "*"*50, "stderr"
-        print err
-        print "*"*50, "retval"
-        print str(retval)
-        print "*" * 50
+        print()
+        print("*"*50, "cmd")
+        print(' '.join(argv))
+        print("*"*50, "stdout")
+        print(out)
+        print("*"*50, "stderr")
+        print(err)
+        print("*"*50, "retval")
+        print(str(retval))
+        print("*" * 50)
 
     # Compare results with the expected.
     expoutfile = os.path.join('outputs', fname) # expected stdout output

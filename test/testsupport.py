@@ -1,5 +1,12 @@
 #!/usr/bin/env python
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import os
 import sys
 import types
@@ -42,7 +49,7 @@ def run(argv):
     results.  Returns (<stdout lines>, <stderr lines>, <return value>).
     Note: 'argv' may also just be the command string.
     """
-    if type(argv) in (types.ListType, types.TupleType):
+    if type(argv) in (list, tuple):
         cmd = _joinArgv(argv)
     else:
         cmd = argv
@@ -57,13 +64,21 @@ def run(argv):
         except IOError:
             # IOError is raised iff the spawned app returns -1. Go
             # figure.
-            retval = -1 
+            retval = -1
         if retval is None:
             retval = 0
     else:
+        """
+        # Old code
         import popen2
         p = popen2.Popen3(cmd, 1)
         i, o, e = p.tochild, p.fromchild, p.childerr
+        """
+        import subprocess as sp
+        p = sp.Popen(cmd,
+                     stdin=sp.PIPE, stdout=sp.PIPE, stderr=sp.PIPE,
+                     close_fds=True)
+        i, o, e = p.stdin, p.stdout, p.stderr
         output = o.read()
         error = e.read()
         i.close()
@@ -78,11 +93,9 @@ def run(argv):
 def _rmtreeOnError(rmFunction, filePath, excInfo):
     if excInfo[0] == OSError:
         # presuming because file is read-only
-        os.chmod(filePath, 0777)
+        os.chmod(filePath, 0o777)
         rmFunction(filePath)
 
 def rmtree(dirname):
     import shutil
     shutil.rmtree(dirname, 0, _rmtreeOnError)
-
-
