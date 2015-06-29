@@ -1,28 +1,24 @@
-preprocess.py -- a portable multi-language file preprocessor
-============================================================
+# preprocess.py -- a portable multi-language file preprocessor
 
-Download the latest preprocess.py packages from here:
-    (archive) http://preprocess.googlecode.com/files/preprocess-1.1.0.zip
-
-
-Home            : http://trentm.com/projects/preprocess/
-License         : MIT (see LICENSE.txt)
-Platforms       : Windows, Linux, Mac OS X, Unix
-Current Version : 1.1
-Dev Status      : Fairly mature, has been used in the Komodo build system for
-                  over 7 years.
-Requirements    : Python >= 2.3 (http://www.activestate.com/ActivePython/)
+Download the latest preprocess.py packages from
+https://github.com/hplgit/preprocess.git.
 
 
-What's new?
------------
+| Home            | http://trentm.com/projects/preprocess/ |
+| License         | MIT (see `LICENSE.txt`) |
+| Platforms       | Windows, Linux, Mac OS X, Unix |
+| Current Version | 1.1 |
+| Dev Status      | Fairly mature, has been used in the Komodo build system for over 7 years. |
+| Requirements    | Python >= 2.3 http://www.activestate.com/ActivePython |
+
+
+## What's new?
 
 Support has been added for preprocessing TeX, Fortran, C#, Java, Shell
 script and PHP files. See the [Change Log](#changelog) below for more.
 
 
-Why preprocess.py?
-------------------
+## Why preprocess.py?
 
 There are millions of templating systems out there (most of them
 developed for the web). This isn't one of those, though it does share
@@ -44,22 +40,24 @@ language of the file being preprocessed). This way the preprocessor
 statements do not make an unpreprocessed file syntactically incorrect.
 For example:
 
+```
     preprocess -D FEATURES=macros,scc myapp.py
-
+```
 will yield this transformation:
 
+```
     ...                                     ...
     # #if "macros" in FEATURES
     def do_work_with_macros():              def do_work_with_macros():
         pass                                    pass
     # #else
     def do_work_without_macros():
-        pass 
+        pass
     # #endif
     ...                                     ...
-
+```
 or, with a JavaScript file:
-
+```
     ...                                     ...
     // #if "macros" in FEATURES
     function do_work_with_macros() {        function do_work_with_macros() {
@@ -69,16 +67,16 @@ or, with a JavaScript file:
     }
     // #endif
     ...                                     ...
-
+```
 Despite these contrived examples preprocess has proved useful for
 build-time code differentiation in the
 [Komodo](http://www.activestate.com/Komodo) build system -- which
 includes source code in Python, JavaScript, XML, CSS, Perl, and C/C++.
 
-The #if expression (`"macros" in FEATURES` in the example) is Python
+The `#if` expression (`"macros" in FEATURES` in the example) is Python
 code, so has Python's full comparison richness.  A number of
 preprocessor statements are implemented:
-
+```
     #define VAR [VALUE]
     #undef VAR
     #ifdef VAR
@@ -89,7 +87,7 @@ preprocessor statements are implemented:
     #endif
     #error ERROR_STRING
     #include "FILE"
-
+```
 As well, preprocess will do in-line substitution of defined variables.
 Although this is currently off by default because substitution will occur
 in program strings, which is not ideal. When a future version of
@@ -100,16 +98,15 @@ Please send any feedback to [Trent Mick](mailto:trentm@google's mail
 thing.com).
 
 
-Install Notes
--------------
+## Install Notes
 
-Download the latest `preprocess` source package, unzip it, and run `python
+Download the latest `preprocess` zip source package, unzip it, and run `python
 setup.py install`:
-
-    unzip preprocess-1.1.0.zip
-    cd preprocess-1.1.0
+```
+    unzip master.zip
+    cd preprocess
     python setup.py install
-
+```
 If your install fails then please visit [the Troubleshooting
 FAQ](http://trentm.com/faq.html#troubleshooting-python-package-installation).
 
@@ -117,29 +114,28 @@ This will install `preprocess.py` into your Python `site-packages` and
 also into your Python bin directory. If you can now run `preprocess`
 and get a response then you are good to go, otherwise read on.
 
-The *problem* is that the Python bin directory is not always on your
-PATH on some operating systems -- notably Mac OS X. To finish the
+The *problem* is that the Python `bin` directory is not always on your
+`PATH` on some operating systems -- notably Mac OS X. To finish the
 install on OS X either manually move 'preprocess' to somewhere on your
-PATH:
-
+`PATH`:
+```
     cp preprocess.py /usr/local/bin/preprocess
-
+```
 or create a symlink to it (try one of these depending on your Python
 version):
-
+```
     ln -s /System/Library/Frameworks/Python.framework/Versions/2.3/bin/preprocess /usr/local/bin/preprocess
     ln -s /Library/Frameworks/Python.framework/Versions/2.4/bin/preprocess /usr/local/bin/preprocess
-
+```
 (Note: You'll probably need to prefix those commands with `sudo` and
 the exact paths may differ on your system.)
 
 
-Getting Started
----------------
+## Getting Started
 
 Once you have it install, run `preprocess --help` for full usage
 information:
-
+```
     $ preprocess --help
     Preprocess a file.
 
@@ -179,7 +175,7 @@ information:
     of the form:
         <comment-prefix> <preprocessor-statement> <comment-suffix>
     where the <comment-prefix/suffix> are the native comment delimiters for
-    that file type. 
+    that file type.
 
 
     Examples
@@ -237,8 +233,7 @@ information:
       error to refer to a variable that has not been defined by a -D
       option or by an in-content #define.
     - Special built-in methods for expressions:
-        defined(varName)    Return true if given variable is defined.  
-
+        defined(varName)    Return true if given variable is defined.
 
     Tips
     ----
@@ -249,16 +244,16 @@ information:
         preprocess -o foo.py foo.p.py
     The advantage is that other tools (esp. editors) will still
     recognize the unpreprocessed file as the original language.
-
+```
 
 And, for module usage, read the preprocess.preprocess() docstring:
-
+```
     pydoc preprocess.preprocess
+```
 
+## Change Log
 
-Change Log
-----------
-
+```
 ### v1.1.0
 - Move to code.google.com/p/preprocess for code hosting.
 - Re-org directory structure to assist with deployment to pypi and
@@ -409,4 +404,4 @@ Change Log
 
 ### 0.1.0:
 - First release.
-
+```
