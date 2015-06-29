@@ -3,19 +3,20 @@
 Download the latest preprocess.py packages from
 https://github.com/hplgit/preprocess.git.
 
-
-| Home            | http://trentm.com/projects/preprocess/ |
-| License         | MIT (see `LICENSE.txt`) |
-| Platforms       | Windows, Linux, Mac OS X, Unix |
-| Current Version | 1.1 |
-| Dev Status      | Fairly mature, has been used in the Komodo build system for over 7 years. |
-| Requirements    | Python >= 2.3 http://www.activestate.com/ActivePython |
+| Name            | Description                              |
+| --------------- | ---------------------------------------- |
+| Home            | https://github.com/hplgit/preprocess.git |
+| License         | MIT (see `LICENSE.txt`)                  |
+| Platforms       | Windows, Linux, Mac OS X, Unix           |
+| Current Version | 1.2                                      |
+| Dev Status      | Fairly mature                            |
+| Requirements    | Python >= 2.7 or Python >= 3.4           |
 
 
 ## What's new?
 
 Support has been added for preprocessing TeX, Fortran, C#, Java, Shell
-script and PHP files. See the [Change Log](#changelog) below for more.
+script and PHP files. See the Change Log below for more.
 
 
 ## Why preprocess.py?
@@ -254,6 +255,10 @@ And, for module usage, read the preprocess.preprocess() docstring:
 ## Change Log
 
 ```
+### v1.2.0
+- Used python-future and the futurize script to port the code to a common
+  Python 2/3 base. Preprocess now depends on python-future.
+
 ### v1.1.0
 - Move to code.google.com/p/preprocess for code hosting.
 - Re-org directory structure to assist with deployment to pypi and
