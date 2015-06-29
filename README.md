@@ -1,4 +1,4 @@
-# preprocess.py -- a portable multi-language file preprocessor
+# preprocess.py: a portable multi-language file preprocessor
 
 Download the latest preprocess.py packages from
 https://github.com/hplgit/preprocess.git.
@@ -11,7 +11,7 @@ https://github.com/hplgit/preprocess.git.
 | Current Version | 1.2                                      |
 | Dev Status      | Fairly mature                            |
 | Requirements    | Python >= 2.7 or Python >= 3.4           |
-
+| Dependencies    | [python-future](http://python-future.org) |
 
 ## What's new?
 
