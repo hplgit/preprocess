@@ -108,15 +108,19 @@ setup.py install`:
     cd preprocess
     python setup.py install
 ```
-If your install fails then please visit [the Troubleshooting
-FAQ](http://trentm.com/faq.html#troubleshooting-python-package-installation).
+Note that `preprocess.py` version 1.2 depends on [python-future](http://python-future.org). If you have `pip` installed, `python-future` is easily installed by
 
-This will install `preprocess.py` into your Python `site-packages` and
-also into your Python bin directory. If you can now run `preprocess`
-and get a response then you are good to go, otherwise read on.
+```
+    pip install future
+```
+
+The `setup.py` command will install `preprocess.py` into your Python
+`site-packages` and also into your Python bin directory. If you can
+now run `preprocess` and get a response then you are good to go,
+otherwise read on.
 
 The *problem* is that the Python `bin` directory is not always on your
-`PATH` on some operating systems -- notably Mac OS X. To finish the
+`PATH` on some operating systems - notably Mac OS X. To finish the
 install on OS X either manually move 'preprocess' to somewhere on your
 `PATH`:
 ```
