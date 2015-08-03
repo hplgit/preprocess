@@ -102,11 +102,20 @@
         #endif
         #error <error string>
         #include "<file>"
+        #include "<file>" fromto: from-regex@to-regex
+        #include "<file>" fromto_: from-regex@to-regex
         #include <var>
       where <expr> is any valid Python expression.
+
+    - About #include with from/to regex: fromto: means that the line
+      with to-regex is not inclued, while fromto_: means that it is
+      included. Note that from-regex and to-regex must be valid
+      regular expressions.
+
     - The expression after #if/elif may be a Python statement. It is an
       error to refer to a variable that has not been defined by a -D
       option or by an in-content #define.
+
     - Special built-in methods for expressions:
         defined(varName)    Return true if given variable is defined.
 
@@ -293,7 +302,11 @@ def preprocess(infile, outfile=sys.stdout, defines={},
                __preprocessedFiles=None):
     """Preprocess the given file.
 
-    "infile" is the input path.
+    "infile" is the input path, either a string (the whole file),
+        or a tuple (filename, from_, to_, last_to_line) that defines
+        the lines in filename from from_ to to_, but not include to_
+        if last_to_line is False. from_ and to_ are treated as
+        regular expressions.
     "outfile" is the output path or stream (default is sys.stdout).
     "defines" is a dictionary of defined variables that will be
         understood in preprocessor statements. Keys must be strings and,
@@ -317,6 +330,11 @@ def preprocess(infile, outfile=sys.stdout, defines={},
     Returns the modified dictionary of defines or raises PreprocessError if
     there was some problem.
     """
+    if isinstance(infile, tuple):
+        infile, from_, to_, last_to_line = infile
+    else:
+        from_, to_, last_to_line = None, None, None
+
     if __preprocessedFiles is None:
         __preprocessedFiles = []
     log.info("preprocess(infile=%r, outfile=%r, defines=%r, force=%r, "\
@@ -361,6 +379,7 @@ def preprocess(infile, outfile=sys.stdout, defines={},
              '#\s*(?P<op>error)\s+(?P<error>.*?)',
              '#\s*(?P<op>define)\s+(?P<var>[^\s]*?)(\s+(?P<val>.+?))?',
              '#\s*(?P<op>undef)\s+(?P<var>[^\s]*?)',
+             '#\s*(?P<op>include) +"(?P<fname>.*?)" +(?P<fromto>fromto_?):\s+(?P<part>.+\n)',
              '#\s*(?P<op>include)\s+"(?P<fname>.*?)"',
              r'#\s*(?P<op>include)\s+(?P<var>[^\s]+?)',
             ]
@@ -386,6 +405,22 @@ def preprocess(infile, outfile=sys.stdout, defines={},
     # simple grammars.)
     fin = open(infile, 'r')
     lines = fin.readlines()
+    if from_ is not None:
+        from_line = -1
+        to_line = -1
+        for i in range(len(lines)):
+            if re.search(from_, lines[i]):
+                from_line = i
+            if to_ != '' and from_line != -1:
+                # not to end of file and has found from_ line
+                if re.search(to_, lines[i]):
+                    to_line = i if last_to_line else i-1
+                    break
+        if to_line == -1:
+            lines = lines[from_line:]
+        else:
+            lines = lines[from_line:to_line+1]
+
     fin.close()
     if isinstance(outfile, (str, bytes)):
         if force and os.path.exists(outfile):
@@ -446,15 +481,29 @@ def preprocess(infile, outfile=sys.stdout, defines={},
                     else:
                         # This is the first include form: #include "path"
                         f = match.group("fname")
+                        fromto = part = None
+                        if "fromto" in match.groupdict():
+                            fromto, part = match.group("fromto", "part")
+                            if fromto == 'fromto_':
+                                last_to_line = True
+                            else:
+                                last_to_line = False
+                            try:
+                                from_, to_ = part.split('@')
+                            except ValueError:
+                                raise PreprocessError('Wrong syntax, need #include %s: from-regex@to-regex' % fromto)
+
 
                     for d in [os.path.dirname(infile)] + includePath:
                         fname = os.path.normpath(os.path.join(d, f))
                         if os.path.exists(fname):
                             break
-                    else:
-                        raise PreprocessError("could not find #include'd file "\
-                                              "\"%s\" on include path: %r"\
-                                              % (f, includePath))
+                        else:
+                            raise PreprocessError("could not find #include'd file "\
+                                                  "\"%s\" on include path: %r"\
+                                                  % (f, includePath))
+                    if fromto is not None:
+                        fname = (fname, from_, to_, last_to_line)
                     defines = preprocess(fname, fout, defines, force,
                                          keepLines, includePath, substitute,
                                          contentTypesRegistry=contentTypesRegistry,
