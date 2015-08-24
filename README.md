@@ -88,7 +88,11 @@ preprocessor statements are implemented:
     #endif
     #error ERROR_STRING
     #include "FILE"
+    #include "FILE" fromto: from-regex@to-regex
+    #include "FILE" fromto_: from-regex@to-regex
 ```
+Run `pydoc preprocess` to see more explanation.
+
 As well, preprocess will do in-line substitution of defined variables.
 Although this is currently off by default because substitution will occur
 in program strings, which is not ideal. When a future version of
@@ -259,9 +263,14 @@ And, for module usage, read the preprocess.preprocess() docstring:
 ## Change Log
 
 ```
+### v1.2.1
+- Added support for including just parts of a file (from a regex to a regex)
+  (By Hans Petter Langtangen.)
+
 ### v1.2.0
 - Used python-future and the futurize script to port the code to a common
   Python 2/3 base. Preprocess now depends on python-future.
+  (By Hans Petter Langtangen.)
 
 ### v1.1.0
 - Move to code.google.com/p/preprocess for code hosting.

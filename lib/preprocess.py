@@ -110,7 +110,9 @@
     - About #include with from/to regex: fromto: means that the line
       with to-regex is not inclued, while fromto_: means that it is
       included. Note that from-regex and to-regex must be valid
-      regular expressions.
+      regular expressions. The to-regex can be left out (but the
+      @ delimiter must be kept), meaning that everything from from-regex
+      to the end of the file is included.
 
     - The expression after #if/elif may be a Python statement. It is an
       error to refer to a variable that has not been defined by a -D
@@ -136,7 +138,7 @@ from builtins import str
 from builtins import range
 from builtins import object
 
-__version_info__ = (1, 2, 0)
+__version_info__ = (1, 2, 1)
 __version__ = '.'.join(map(str, __version_info__))
 
 import os
