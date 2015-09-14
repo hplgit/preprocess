@@ -822,7 +822,9 @@ except NameError:
 
 #---- mainline
 
-def main(argv):
+def main(argv=None):
+    if argv is None:
+        argv = sys.argv
     try:
         optlist, args = getopt.getopt(argv[1:], 'hVvo:D:fkI:sc:',
             ['help', 'version', 'verbose', 'force', 'keep-lines',
