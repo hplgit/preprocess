@@ -21,7 +21,7 @@ command line app and as a Python module.
 import os
 import sys
 import distutils
-from distutils.core import setup
+from setuptools import setup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "lib"))
 try:
@@ -48,7 +48,6 @@ if sys.version_info < (2, 3):
         _setup(**kwargs)
 
 doclines = __doc__.split("\n")
-script = (sys.platform == "win32" and "bin\\preprocess.exe" or "bin/preprocess")
 
 setup(
     name="preprocess",
@@ -60,7 +59,7 @@ setup(
     platforms=["any"],
     py_modules=["preprocess"],
     package_dir={"": "lib"},
-    scripts=[script],
+    entry_points={'console_scripts': ['preprocess = preprocess:main']},
     description=doclines[0],
     classifiers=filter(None, classifiers.split("\n")),
     long_description="\n".join(doclines[2:]),
