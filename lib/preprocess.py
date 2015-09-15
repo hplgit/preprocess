@@ -263,7 +263,8 @@ class _Logger(object):
     def fatal(self, msg, *args):
         self.log(self.CRITICAL, msg, *args)
 
-log = _Logger("preprocess", _Logger.WARN)
+#log = _Logger("preprocess", _Logger.WARN)
+log = _Logger("preprocess", _Logger.DEBUG)
 
 
 
@@ -345,8 +346,11 @@ def preprocess(infile, outfile=sys.stdout, defines={},
              keepLines, includePath, contentType, __preprocessedFiles)
     absInfile = os.path.normpath(os.path.abspath(infile))
     if absInfile in __preprocessedFiles:
-        raise PreprocessError("detected recursive #include of '%s'"\
-                              % infile)
+        pass
+        # Allow the same file to be included multiple times, it is not
+        # necessarily recursive include!
+        #raise PreprocessError("detected recursive #include of '%s'"\
+        #                      % infile)
     __preprocessedFiles.append(os.path.abspath(infile))
 
     # Determine the content type and comment info for the input file.
