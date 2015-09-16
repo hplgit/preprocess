@@ -263,8 +263,8 @@ class _Logger(object):
     def fatal(self, msg, *args):
         self.log(self.CRITICAL, msg, *args)
 
-#log = _Logger("preprocess", _Logger.WARN)
-log = _Logger("preprocess", _Logger.DEBUG)
+log = _Logger("preprocess", _Logger.WARN)
+#log = _Logger("preprocess", _Logger.DEBUG)
 
 
 
