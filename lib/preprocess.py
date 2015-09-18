@@ -500,6 +500,14 @@ def preprocess(infile, outfile=sys.stdout, defines={},
                                 raise PreprocessError('Wrong syntax, need #include %s: from-regex@to-regex' % fromto)
 
 
+                    # HPL modification:
+                    # Perform substitutions here such that #include statements
+                    # can use defines.
+                    if substitute:
+                        for name in reversed(sorted(defines, key=len)):
+                            value = defines[name]
+                            f = f.replace(name, str(value))
+
                     for d in [os.path.dirname(infile)] + includePath:
                         fname = os.path.normpath(os.path.join(d, f))
                         if os.path.exists(fname):
