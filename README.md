@@ -14,12 +14,6 @@ https://github.com/hplgit/preprocess.git.
 | Dependencies    | [python-future](http://python-future.org) |
 | Author          | Trent Mick                               |
 
-## What's new?
-
-Support has been added for preprocessing TeX, Fortran, C#, Java, Shell
-script and PHP files. See the Change Log below for more.
-
-
 ## Why preprocess.py?
 
 There are millions of templating systems out there (most of them
@@ -40,12 +34,66 @@ Here is how is works: All preprocessor statements are on their own
 line. A preprocessor statement is a comment (as appropriate for the
 language of the file being preprocessed). This way the preprocessor
 statements do not make an unpreprocessed file syntactically incorrect.
-For example:
+
+Here is a simple example from Python code in some file `myapp1.p.py`:
 
 ```
-    preprocess -D FEATURES=macros,scc myapp.py
+    def myfunc():
+        """
+        Function for computing fundamental arithmetics.
+    # #if EXTENSIVE_DOC
+    # #include "../myfunc_doc.txt"
+    # #endif
+        """
+        return 1 + 1
 ```
-will yield this transformation:
+Running
+
+```
+    preprocess myapp1.p.py > myapp1.py
+```
+yields
+
+```
+    def myfunc():
+        """
+        Function for computing fundamental arithmetics.
+        """
+        return 1 + 1
+```
+in `myapp1.py` since `EXTENSIVE_DOC` is not defined, but
+
+```
+    preprocess -DEXTENSIVE_DOC myapp1.p.py > myapp1.py
+```
+defines `EXTENSIVE_DOC` and the file `../myfunc_doc.txt` is copied
+by the `#include` statement, resulting in the output
+
+```
+    def myfunc():
+        """
+        Function for computing fundamental arithmetics.
+        This function takes
+        the expression "1 + 1"
+        and returns its result.
+        """
+        return 1 + 1
+```
+if the file `../myfunc_doc.txt` contains the text
+
+```
+        This function takes
+        the expression "1 + 1"
+        and returns its result.
+```
+
+Here is another example where a variable defined on the command
+line is a list:
+
+```
+    preprocess -DFEATURES=macros,scc myapp2.p.py
+```
+The code to the left is transformed to the code to the right:
 
 ```
     ...                                     ...
@@ -58,7 +106,8 @@ will yield this transformation:
     # #endif
     ...                                     ...
 ```
-or, with a JavaScript file:
+Or, with a JavaScript file,
+
 ```
     ...                                     ...
     // #if "macros" in FEATURES
@@ -70,14 +119,17 @@ or, with a JavaScript file:
     // #endif
     ...                                     ...
 ```
-Despite these contrived examples preprocess has proved useful for
+
+Preprocess has proved useful for
 build-time code differentiation in the
 [Komodo](http://www.activestate.com/Komodo) build system -- which
 includes source code in Python, JavaScript, XML, CSS, Perl, and C/C++.
+Preprocess is also a key tool in the [DocOnce](https://github.com/hplgit/doconce) documentation system.
 
 The `#if` expression (`"macros" in FEATURES` in the example) is Python
-code, so has Python's full comparison richness.  A number of
+code, so it has Python's full comparison richness.  A number of
 preprocessor statements are implemented:
+
 ```
     #define VAR [VALUE]
     #undef VAR
@@ -94,14 +146,14 @@ preprocessor statements are implemented:
 ```
 Run `pydoc preprocess` to see more explanation.
 
-As well, preprocess will do in-line substitution of defined variables.
+As well, preprocess can do in-line substitution of defined variables.
 Although this is currently off by default because substitution will occur
-in program strings, which is not ideal. When a future version of
-preprocess can lex languages being preprocessed it will NOT substitute
-into program strings and substitution will be turned ON by default.
+in program strings (and actually anywhere), which is not ideal.
 
-Please send any feedback to [Trent Mick](mailto:trentm@google's mail
-thing.com).
+Please send any feedback to the original author
+[Trent Mick](mailto:trentm@google.com) or the current maintainer
+[Hans Petter Langtangen](mailto:hpl@simula.no).
+
 
 
 ## Install Notes
