@@ -12,6 +12,7 @@ https://github.com/hplgit/preprocess.git.
 | Dev Status      | Fairly mature                            |
 | Requirements    | Python >= 2.7 or Python >= 3.4           |
 | Dependencies    | [python-future](http://python-future.org) |
+| Author          | Trent Mick                               |
 
 ## What's new?
 
