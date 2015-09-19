@@ -30,7 +30,8 @@
                         numbers to stay constant.
         -s, --substitute    Substitute defines into emitted lines. By
                         default substitution is NOT done because it
-                        currently will substitute into program strings.
+                        currently will substitute into everything, e.g.,
+                        program strings.
         -c, --content-types-path <path>
                         Specify a path to a content.types file to assist
                         with filetype determination. See the
@@ -300,7 +301,8 @@ def _evaluate(expr, defines):
 #---- module API
 
 def preprocess(infile, outfile=sys.stdout, defines={},
-               force=0, keepLines=0, includePath=[], substitute=0,
+               force=0, keepLines=0, includePath=[],
+               substitute=0, include_substitute=0,
                contentType=None, contentTypesRegistry=None,
                __preprocessedFiles=None):
     """Preprocess the given file.
@@ -321,8 +323,10 @@ def preprocess(infile, outfile=sys.stdout, defines={},
     "includePath" is a list of directories to search for given #include
         directives. The directory of the file being processed is presumed.
     "substitute", if true, will allow substitution of defines into emitted
-        lines. (NOTE: This substitution will happen within program strings
-        as well. This may not be what you expect.)
+        lines. (NOTE: This substitution will happen to anything, e.g.,
+        within program strings, and this may not be what you expect!)
+    "include_substitute", if true, will allow substitution of defines into
+        #include statements.
     "contentType" can be used to specify the content type of the input
         file. It not given, it will be guessed.
     "contentTypesRegistry" is an instance of ContentTypesRegistry. If not specified
@@ -503,7 +507,7 @@ def preprocess(infile, outfile=sys.stdout, defines={},
                     # HPL modification:
                     # Perform substitutions here such that #include statements
                     # can use defines.
-                    if substitute:
+                    if include_substitute:
                         for name in reversed(sorted(defines, key=len)):
                             value = defines[name]
                             f = f.replace(name, str(value))
@@ -519,7 +523,8 @@ def preprocess(infile, outfile=sys.stdout, defines={},
                     if fromto is not None:
                         fname = (fname, from_, to_, last_to_line)
                     defines = preprocess(fname, fout, defines, force,
-                                         keepLines, includePath, substitute,
+                                         keepLines, includePath,
+                                         substitute, include_substitute,
                                          contentTypesRegistry=contentTypesRegistry,
                                          __preprocessedFiles=__preprocessedFiles)
             elif op in ("if", "ifdef", "ifndef"):
@@ -838,9 +843,9 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
     try:
-        optlist, args = getopt.getopt(argv[1:], 'hVvo:D:fkI:sc:',
+        optlist, args = getopt.getopt(argv[1:], 'hVvo:D:fkI:sic:',
             ['help', 'version', 'verbose', 'force', 'keep-lines',
-             'substitute', 'content-types-path='])
+             'substitute', 'include_substitute', 'content-types-path='])
     except getopt.GetoptError as msg:
         sys.stderr.write("preprocess: error: %s. Your invocation was: %s\n"\
                          % (msg, argv))
@@ -851,6 +856,7 @@ def main(argv=None):
     force = 0
     keepLines = 0
     substitute = 0
+    include_substitute = 0
     includePath = []
     contentTypesPaths = []
     for opt, optarg in optlist:
@@ -882,6 +888,8 @@ def main(argv=None):
             includePath.append(optarg)
         elif opt in ('-s', '--substitute'):
             substitute = 1
+        elif opt in ('-i', '--include_substitute'):
+            include_substitute = 1
         elif opt in ('-c', '--content-types-path'):
             contentTypesPaths.append(optarg)
 
@@ -895,7 +903,8 @@ def main(argv=None):
     try:
         contentTypesRegistry = ContentTypesRegistry(contentTypesPaths)
         preprocess(infile, outfile, defines, force, keepLines, includePath,
-                   substitute, contentTypesRegistry=contentTypesRegistry)
+                   substitute, include_substitute,
+                   contentTypesRegistry=contentTypesRegistry)
     except PreprocessError as ex:
         if log.isDebugEnabled():
             import traceback
