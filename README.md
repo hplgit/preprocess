@@ -263,6 +263,10 @@ And, for module usage, read the preprocess.preprocess() docstring:
 ## Change Log
 
 ```
+### v1.2.2
+- Added `--substitute_include` and `-i` options for substitutions of defined variables (`-DVAR=value`) in `#include` statements (makes it possible to have variables in included filenames).
+  (By Hans Petter Langtangen.)
+
 ### v1.2.1
 - Added support for including just parts of a file (from a regex to a regex)
   (By Hans Petter Langtangen.)

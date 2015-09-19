@@ -139,7 +139,7 @@ from builtins import str
 from builtins import range
 from builtins import object
 
-__version_info__ = (1, 2, 1)
+__version_info__ = (1, 2, 2)
 __version__ = '.'.join(map(str, __version_info__))
 
 import os
